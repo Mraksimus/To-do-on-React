@@ -11,29 +11,31 @@ import {
 } from '@chakra-ui/react'
 
 export const Home = () => {
-    const [todos, setTodos] = useState([])
-    const [text, setText] = useState('')
+    const [todos, setTodos] = useState([]);
+    const [text, setText] = useState('');
 
     useEffect(() => {
-        const storedTodos = localStorage.getItem('todos');
-        if (storedTodos) {
-            setTodos(JSON.parse(storedTodos))
-        }
+        const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+        setTodos(storedTodos);
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('todos', JSON.stringify(todos))
+        localStorage.setItem('todos', JSON.stringify(todos));
     }, [todos]);
 
-    const createTodoHandler = (text) => {
-        setTodos((prevState) => [...prevState, { id: Date.now(), text }])
-        setText('')
-        // a = [1,2,3] => b = [...[1,2,3], 4,5,6] = [1,2,3,4,5,6]
-    }
+    const createTodoHandler = () => {
+        if (text.trim() !== '') {
+            setTodos((prevState) => [
+                ...prevState,
+                { id: Date.now(), text: text.trim() },
+            ]);
+            setText('');
+        }
+    };
 
     const removeTodoHandler = (id) => {
-        setTodos((prevState) => prevState.filter((todo) => todo.id !== id))
-    }
+        setTodos((prevState) => prevState.filter((todo) => todo.id !== id));
+    };
 
     return (
         <Flex
