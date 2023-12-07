@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { chakra, Button, List, ListItem, Heading, Flex, Input, Text } from '@chakra-ui/react';
+import {chakra, Button, List, ListItem, Heading, Flex, Input, Text, border} from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Home = () => {
@@ -82,7 +82,7 @@ export const Home = () => {
                                 </Text>
                                 <Button
                                     onClick={() => removeTodoHandler(todo.id)}
-                                    background="red.500"
+                                    background="blue.500"
                                     color="white"
                                     _hover={{
                                         background: 'red.600',
