@@ -1,14 +1,6 @@
-import React, {useEffect, useState} from 'react'
-import {
-    chakra,
-    Button,
-    List,
-    ListItem,
-    Heading,
-    Flex,
-    Input,
-    Text,
-} from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react';
+import { chakra, Button, List, ListItem, Heading, Flex, Input, Text } from '@chakra-ui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Home = () => {
     const [todos, setTodos] = useState([]);
@@ -27,7 +19,7 @@ export const Home = () => {
         if (text.trim() !== '') {
             setTodos((prevState) => [
                 ...prevState,
-                { id: Date.now(), text: text.trim() },
+                { id: Date.now(), text: text.trim(), completed: false },
             ]);
             setText('');
         }
@@ -35,6 +27,14 @@ export const Home = () => {
 
     const removeTodoHandler = (id) => {
         setTodos((prevState) => prevState.filter((todo) => todo.id !== id));
+    };
+
+    const toggleCompleteHandler = (id) => {
+        setTodos((prevState) =>
+            prevState.map((todo) =>
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            )
+        );
     };
 
     return (
@@ -57,33 +57,48 @@ export const Home = () => {
                 borderRadius="md"
                 p="10px"
             >
-                {todos.map((todo) => (
-                    <ListItem
-                        key={todo.id}
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        borderBottom="1px solid gray"
-                        py="8px"
-                    >
-                        <Text>{todo.text}</Text>
-                        <Button
-                            onClick={() => removeTodoHandler(todo.id)}
-                            background="red.500"
-                            color="white"
-                            _hover={{
-                                background: 'red.600',
-                            }}
+                <AnimatePresence>
+                    {todos.map((todo, index) => (
+                        <motion.div
+                            key={todo.id}
+                            initial={{ opacity: 0, y: 1500 }}
+                            animate={{ opacity: 2, y: 0 }}
+                            exit={{ opacity: 0, y: -1500 }}
+                            transition={{ duration: 0.7 }}
                         >
-                            Удалить
-                        </Button>
-                    </ListItem>
-                ))}
+                            <ListItem
+                                display="flex"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                borderBottom="1px solid gray"
+                                py="8px"
+                            >
+                                <Text
+                                    textDecoration={todo.completed ? 'line-through' : 'none'}
+                                    onClick={() => toggleCompleteHandler(todo.id)}
+                                    cursor="pointer"
+                                >
+                                    {todo.text}
+                                </Text>
+                                <Button
+                                    onClick={() => removeTodoHandler(todo.id)}
+                                    background="red.500"
+                                    color="white"
+                                    _hover={{
+                                        background: 'red.600',
+                                    }}
+                                >
+                                    Удалить
+                                </Button>
+                            </ListItem>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
             </List>
             <chakra.form
                 onSubmit={(e) => {
-                    e.preventDefault() // Без перезагрузки приложения после добавления задачи
-                    createTodoHandler(text)
+                    e.preventDefault(); // Без перезагрузки приложения после добавления задачи
+                    createTodoHandler(text);
                 }}
                 display="flex"
                 flexDirection="column"
@@ -112,5 +127,5 @@ export const Home = () => {
                 </Button>
             </chakra.form>
         </Flex>
-    )
-}
+    );
+};
