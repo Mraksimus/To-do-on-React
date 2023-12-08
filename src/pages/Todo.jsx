@@ -1,29 +1,32 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { chakra, Button, List, ListItem, Heading, Flex, Input, Text } from '@chakra-ui/react';
-import {motion, AnimatePresence, useTransform, useViewportScroll} from 'framer-motion';
-import { animate } from "framer-motion/dom"
-import '../styles/Todo.css';
+import { motion, AnimatePresence, useTransform, useViewportScroll } from 'framer-motion';
 
 export const Todo = () => {
     const [todos, setTodos] = useState([]);
     const [text, setText] = useState('');
-    const listRef = useRef(null);
+    const [showCompleted, setShowCompleted] = useState(true); // Добавлено состояние для фильтрации
 
-    const scrollToBottom = () => {
-        const targetScroll = listRef.current.scrollHeight - listRef.current.clientHeight;
-        motion(listRef.current).animate({ scrollTop: targetScroll }, { duration: 0.5 });
-    };
+    const listRef = useRef(null);
 
     useEffect(() => {
         const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+        setTodos(storedTodos);
     }, []);
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
-        listRef.current.scrollTop = listRef.current.scrollHeight;
-    }, [todos]);
+        if (showCompleted) {
 
-    const { scrollYProgress } = useViewportScroll()
+        }
+    }, [todos, showCompleted]);
+
+    // const scrollToBottom = () => {
+    //     const targetScroll = listRef.current.scrollHeight - listRef.current.clientHeight;
+    //     motion(listRef.current).animate({ scrollTop: targetScroll }, { duration: 0.5 });
+    // };
+
+    const { scrollYProgress } = useViewportScroll();
     const scale = useTransform(scrollYProgress, [0, 1], [0.2, 2]);
 
     const createTodoHandler = () => {
@@ -48,6 +51,12 @@ export const Todo = () => {
         );
     };
 
+    const filterCompletedHandler = () => {
+        setShowCompleted(!showCompleted);
+    };
+
+    const filteredTodos = showCompleted ? todos : todos.filter((todo) => !todo.completed);
+
     return (
         <Flex
             flexDirection="column"
@@ -60,7 +69,7 @@ export const Todo = () => {
             <Heading textTransform="uppercase">Todo List</Heading>
             <chakra.form
                 onSubmit={(e) => {
-                    e.preventDefault(); // Без перезагрузки приложения после добавления задачи
+                    e.preventDefault();
                     createTodoHandler(text);
                 }}
                 display="flex"
@@ -96,6 +105,18 @@ export const Todo = () => {
                 >
                     Добавить задачу
                 </Button>
+                <Button
+                    onClick={filterCompletedHandler}
+                    w="fit-content"
+                    h="70%"
+                    background={showCompleted ? "gray.300" : "#4BB34B"}
+                    color="white"
+                    _hover={{
+                        background: "#4BB34B"
+                    }}
+                >
+                    {showCompleted ? "Показать невыполненные" : "Показать выполненные"}
+                </Button>
             </chakra.form>
             <List
                 ref={listRef}
@@ -109,7 +130,7 @@ export const Todo = () => {
                 p="10px"
             >
                 <AnimatePresence>
-                    {todos.map((todo, index) => (
+                    {filteredTodos.map((todo, index) => (
                         <motion.div
                             key={todo.id}
                             initial={{ opacity: 0, x: -1500 }}
@@ -121,6 +142,7 @@ export const Todo = () => {
                                 display="flex"
                                 justifyContent="space-between"
                                 alignItems="center"
+                                background={todo.completed ? 'green.50' : 'white'}
                                 borderRadius="20px"
                                 boxShadow="0 2px 10px 1px rgba(34, 60, 80, 0.2)"
                                 p="8px 20px"
@@ -135,7 +157,7 @@ export const Todo = () => {
                                 </Text>
                                 <Button
                                     onClick={() => removeTodoHandler(todo.id)}
-                                    background="blue.500"
+                                    background="gray.300"
                                     color="white"
                                     transition=".36s"
                                     _hover={{

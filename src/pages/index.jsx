@@ -7,8 +7,8 @@ export const Pages = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/Home" element={<Home />} />
-                <Route path="/" element={<Todo />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/Home" element={<Todo />} />
                 <Route path="*" element={<Page404 />} />
             </Routes>
         </BrowserRouter>
